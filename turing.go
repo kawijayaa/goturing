@@ -18,7 +18,50 @@ func TuringMachine(initial_state *StateObject) (*TuringObject, error) {
 	}
 }
 
-func (turing *TuringObject) Run(input string, steps bool) Status {
+func (turing *TuringObject) IsDeterministic() bool {
+	return is_deterministic_recursive(turing.initial_state, make([]*StateObject, 0))
+}
+
+func is_deterministic_recursive(state *StateObject, visited_states []*StateObject) bool {
+	for _, visited_state := range visited_states {
+		if visited_state == state {
+			return true
+		}
+	}
+
+	visited_states = append(visited_states, state)
+	
+	if len(state.transitions) == 0 {
+		return true
+	}
+
+	var read_chars []rune = make([]rune, 0)
+
+	for _, transition := range state.transitions {
+		for _, char := range read_chars {
+			if char == transition.read_char {
+				return false
+			}
+		}
+
+		read_chars = append(read_chars, transition.read_char)
+	}
+
+	is_deterministic := true
+	for _, transition := range state.transitions {
+		is_deterministic = is_deterministic && is_deterministic_recursive(transition.state_destination, visited_states)
+		if !is_deterministic {
+			return is_deterministic
+		}
+	}
+
+	return is_deterministic
+}
+
+func (turing *TuringObject) Run(input string, steps bool) (Status, error) {
+	if !turing.IsDeterministic() {
+		return UNDEFINED, errors.New("turing machine is not deterministic")
+	}
 	turing.tape.SetInitialState([]rune(input))
 
 	current_state := turing.initial_state
@@ -49,9 +92,9 @@ func (turing *TuringObject) Run(input string, steps bool) Status {
 				turing.tape.Print()
 			}
 		} else {
-			return REJECTED
+			return REJECTED, nil
 		}
 	}
 
-	return ACCEPTED
+	return ACCEPTED, nil
 }
