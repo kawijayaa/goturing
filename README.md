@@ -9,10 +9,8 @@ TuringMachine(initial_state *StateObject) (*TuringObject, error)
 TuringObject.Run(input string, steps bool) Status
 TuringObject.IsDeterministic() bool
 
-
 State(name string, is_final bool, is_inital bool) *StateObject
 StateObject.AddTransition(transition *TransitionObject) error
-
 
 Transition(read_char rune, write_char rune, direction Direction, state_destination *StateObject) *TransitionObject
 
