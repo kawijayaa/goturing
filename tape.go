@@ -19,18 +19,16 @@ func Tape() *TapeObject {
 	return &TapeObject{pointer_index, tape}
 }
 
-func (tape *TapeObject) Set(char rune) error {
-	return tape.tape.Set(tape.pointer_index, char)
+func (tape *TapeObject) Set(char rune) {
+	tape.tape.Set(tape.pointer_index, char)
 }
 
-func (tape *TapeObject) Get() (rune, error) {
-	char, err := tape.tape.Get(tape.pointer_index)
+func (tape *TapeObject) SetInitialState(input []rune) {
+	tape.tape.positive = input
+}
 
-	if err != nil {
-		return rune(0), err
-	}
-
-	return char, nil
+func (tape *TapeObject) Get() rune {
+	return tape.tape.Get(tape.pointer_index)
 }
 
 func (tape *TapeObject) Move(direction Direction) error {
@@ -62,7 +60,7 @@ func (tape *TapeObject) Print() {
 	var print_upper_boundary int = int(math.Max(float64(tape.pointer_index), float64(upper_bound)))
 
 	for i := print_lower_boundary; i <= print_upper_boundary; i++ {
-		char, _ := tape.tape.Get(i)
+		char := tape.tape.Get(i)
 
 		if char == rune(0) {
 			tape_str = append(tape_str, "~")

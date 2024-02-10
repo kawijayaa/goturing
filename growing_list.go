@@ -2,7 +2,6 @@ package goturing
 
 import (
 	"math"
-	"errors"
 	"slices"
 )
 
@@ -15,7 +14,7 @@ func GrowingList() *GrowingListObject {
 	return &GrowingListObject{make([]rune, 1), make([]rune, 0)}
 }
 
-func (gl *GrowingListObject) Set(index int, char rune) error {
+func (gl *GrowingListObject) Set(index int, char rune) {
 	if index >= 0 {
 		if index < len(gl.positive) {
 			gl.positive[index] = char
@@ -32,35 +31,33 @@ func (gl *GrowingListObject) Set(index int, char rune) error {
 			gl.negative[adjusted_index] = char
 		}
 	}
-
-	return nil
 }
 
-func (gl *GrowingListObject) Get(index int) (rune, error) {
+func (gl *GrowingListObject) Get(index int) rune {
 	if index >= 0 {
 		if index >= len(gl.positive) {
-			return rune(0), errors.New("index out of bounds")
+			return '~'
 		}
 
-		return gl.positive[index], nil
+		return gl.positive[index]
 	} else {
 		var adjusted_index int = int(math.Abs(float64(index))) - 1
 
 		if adjusted_index >= len(gl.negative) {
-			return rune(0), errors.New("index out of bounds")
+			return '~'
 		}
 
-		return gl.negative[adjusted_index], nil
+		return gl.negative[adjusted_index]
 	}
 }
 
-func (gl *GrowingListObject) Slice() ([]rune, error) {
+func (gl *GrowingListObject) Slice() []rune {
 	var reversed_negative []rune = make([]rune, len(gl.negative))
 
 	copy(reversed_negative, gl.negative)
 	slices.Reverse(reversed_negative)
 	
-	return append(reversed_negative, gl.positive...), nil
+	return append(reversed_negative, gl.positive...)
 }
 
 func (gl *GrowingListObject) CheckIndex(index int) bool {
